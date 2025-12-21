@@ -3,11 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Prunable;
 
 class Notification extends Model
 {
     protected $table = 'notifications';
     protected $primaryKey = 'id_notification';
+    use Prunable;
 
     protected $fillable = [
         'id_user',
@@ -83,5 +85,10 @@ class Notification extends Model
             'is_read' => false,
             'read_at' => null,
         ]);
+    }
+
+    public function prunable()
+    {
+        return static::where('created_at', '<=', now()->subDays(30));
     }
 }

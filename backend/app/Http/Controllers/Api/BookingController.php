@@ -103,15 +103,25 @@ class BookingController extends Controller
     // DELETE /api/bookings/{id} - Cancel booking (GA only)
     public function destroy($id)
     {
-        $booking = RoomBooking::findOrFail($id);
+        $booking = RoomBooking::with(['request.user', 'room'])->findOrFail($id);
 
-        // Check if past
         if ($booking->isPast()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Cannot cancel past bookings',
             ], 422);
         }
+
+        // Collect data sebelum delete
+        $bookingData = [
+            'room_name' => $booking->room->nama_ruangan,
+            'tanggal' => $booking->tanggal->format('d/m/Y'),
+            'jam_mulai' => $booking->jam_mulai,
+            'jam_selesai' => $booking->jam_selesai,
+        ];
+
+        $userId = $booking->request->user->id_user;
+        $cancelledBy = auth()->user()->nama;
 
         // Update request status
         $booking->request->update(['status' => 'cancelled']);
@@ -121,9 +131,38 @@ class BookingController extends Controller
 
         $booking->delete();
 
+        // ✅ DISPATCH JOB - SendBookingCancellationJob
+        \App\Jobs\SendBookingCancellationJob::dispatch($userId, $bookingData, $cancelledBy);
+
         return response()->json([
             'success' => true,
             'message' => 'Booking cancelled successfully',
         ]);
     }
+
+    // public function destroy($id)
+    // {
+    //     $booking = RoomBooking::findOrFail($id);
+
+    //     // Check if past
+    //     if ($booking->isPast()) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Cannot cancel past bookings',
+    //         ], 422);
+    //     }
+
+    //     // Update request status
+    //     $booking->request->update(['status' => 'cancelled']);
+
+    //     // Delete notification schedules
+    //     $booking->notificationSchedules()->delete();
+
+    //     $booking->delete();
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => 'Booking cancelled successfully',
+    //     ]);
+    // }
 }

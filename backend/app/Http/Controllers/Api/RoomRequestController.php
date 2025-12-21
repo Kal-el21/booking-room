@@ -208,7 +208,6 @@ class RoomRequestController extends Controller
 
         $room = Room::findOrFail($validated['id_room']);
 
-        // Check room availability
         if (!$room->isAvailableAt($roomRequest->tanggal, $roomRequest->jam_mulai, $roomRequest->jam_selesai)) {
             return response()->json([
                 'success' => false,
@@ -216,13 +215,11 @@ class RoomRequestController extends Controller
             ], 422);
         }
 
-        // Update request
         $roomRequest->update([
             'status' => 'approved',
             'id_assigned_by' => auth()->id(),
         ]);
 
-        // Create booking
         $booking = $roomRequest->booking()->create([
             'id_room' => $room->id_room,
             'booked_by' => auth()->id(),
@@ -231,17 +228,13 @@ class RoomRequestController extends Controller
             'jam_selesai' => $roomRequest->jam_selesai,
         ]);
 
-        // Update room status (akan di-handle di observer/job)
-        // $room->update(['status' => 'occupied']);
-
-        // Log action
         AuditLog::log('approve', 'room_requests', $roomRequest->id_request,
             ['status' => 'pending'],
             ['status' => 'approved', 'id_assigned_by' => auth()->id()]
         );
 
-        // TODO: Create notification & schedule
-        // TODO: Send email notification
+        // ✅ DISPATCH JOB - SendBookingConfirmationJob
+        \App\Jobs\SendBookingConfirmationJob::dispatch($booking);
 
         return response()->json([
             'success' => true,
@@ -249,6 +242,66 @@ class RoomRequestController extends Controller
             'data' => $roomRequest->load(['booking.room', 'assignedBy']),
         ]);
     }
+
+
+    // public function approve($id, Request $request)
+    // {
+    //     $validated = $request->validate([
+    //         'id_room' => 'required|exists:rooms,id_room',
+    //     ]);
+
+    //     $roomRequest = RoomRequest::findOrFail($id);
+
+    //     if (!$roomRequest->canBeApproved()) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Request cannot be approved',
+    //         ], 422);
+    //     }
+
+    //     $room = Room::findOrFail($validated['id_room']);
+
+    //     // Check room availability
+    //     if (!$room->isAvailableAt($roomRequest->tanggal, $roomRequest->jam_mulai, $roomRequest->jam_selesai)) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Room is not available at the requested time',
+    //         ], 422);
+    //     }
+
+    //     // Update request
+    //     $roomRequest->update([
+    //         'status' => 'approved',
+    //         'id_assigned_by' => auth()->id(),
+    //     ]);
+
+    //     // Create booking
+    //     $booking = $roomRequest->booking()->create([
+    //         'id_room' => $room->id_room,
+    //         'booked_by' => auth()->id(),
+    //         'tanggal' => $roomRequest->tanggal,
+    //         'jam_mulai' => $roomRequest->jam_mulai,
+    //         'jam_selesai' => $roomRequest->jam_selesai,
+    //     ]);
+
+    //     // Update room status (akan di-handle di observer/job)
+    //     // $room->update(['status' => 'occupied']);
+
+    //     // Log action
+    //     AuditLog::log('approve', 'room_requests', $roomRequest->id_request,
+    //         ['status' => 'pending'],
+    //         ['status' => 'approved', 'id_assigned_by' => auth()->id()]
+    //     );
+
+    //     // TODO: Create notification & schedule
+    //     // TODO: Send email notification
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => 'Request approved successfully',
+    //         'data' => $roomRequest->load(['booking.room', 'assignedBy']),
+    //     ]);
+    // }
 
     // POST /api/room-requests/{id}/reject - Reject request (GA only)
     public function reject($id, Request $request)
@@ -272,13 +325,13 @@ class RoomRequestController extends Controller
             'rejected_reason' => $validated['rejected_reason'],
         ]);
 
-        // Log action
         AuditLog::log('reject', 'room_requests', $roomRequest->id_request,
             ['status' => 'pending'],
             ['status' => 'rejected', 'rejected_reason' => $validated['rejected_reason']]
         );
 
-        // TODO: Send notification to user
+        // ✅ DISPATCH JOB - SendBookingRejectedJob
+        \App\Jobs\SendBookingRejectedJob::dispatch($roomRequest->load(['user', 'assignedBy']));
 
         return response()->json([
             'success' => true,
@@ -286,6 +339,42 @@ class RoomRequestController extends Controller
             'data' => $roomRequest,
         ]);
     }
+
+    // public function reject($id, Request $request)
+    // {
+    //     $validated = $request->validate([
+    //         'rejected_reason' => 'required|string',
+    //     ]);
+
+    //     $roomRequest = RoomRequest::findOrFail($id);
+
+    //     if (!$roomRequest->isPending()) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Can only reject pending requests',
+    //         ], 422);
+    //     }
+
+    //     $roomRequest->update([
+    //         'status' => 'rejected',
+    //         'id_assigned_by' => auth()->id(),
+    //         'rejected_reason' => $validated['rejected_reason'],
+    //     ]);
+
+    //     // Log action
+    //     AuditLog::log('reject', 'room_requests', $roomRequest->id_request,
+    //         ['status' => 'pending'],
+    //         ['status' => 'rejected', 'rejected_reason' => $validated['rejected_reason']]
+    //     );
+
+    //     // TODO: Send notification to user
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => 'Request rejected',
+    //         'data' => $roomRequest,
+    //     ]);
+    // }
 
     // GET /api/room-requests/{id}/available-rooms - Get available rooms for request
     public function getAvailableRooms($id)
