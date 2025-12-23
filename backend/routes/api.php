@@ -63,8 +63,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Bookings (Read Only for Users)
     Route::get('/bookings', [BookingController::class, 'index']);
-    Route::get('/bookings/{id}', [BookingController::class, 'show']);
     Route::get('/bookings/calendar', [BookingController::class, 'calendar']);
+    Route::get('/bookings/{id}', [BookingController::class, 'show']);
 
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index']);
@@ -80,7 +80,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // ADMIN RUANGAN ROUTES
     // ============================================
 
-    Route::middleware('role:admin_ruangan,GA')->group(function () {
+    Route::middleware('role:admin_ruangan')->group(function () {
         // Room Management
         Route::post('/rooms', [RoomController::class, 'store']);
         Route::put('/rooms/{id}', [RoomController::class, 'update']);
