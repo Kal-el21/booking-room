@@ -26,14 +26,14 @@ class UpdateUserRequest extends FormRequest
         $userId = $this->route('id');
 
         return [
-            'nama' => 'sometimes|string|max:255',
-            'divisi' => 'nullable|string|max:255',
+            'name' => 'sometimes|string|max:255',
+            'division' => 'nullable|string|max:255',
             'email' => [
                 'sometimes',
                 'email',
                 Rule::unique('users', 'email')->ignore($userId, 'id_user'),
             ],
-            'role' => 'sometimes|in:user,admin_ruangan,GA',
+            'role' => 'sometimes|in:user,room_admin,GA',
             'is_active' => 'sometimes|boolean',
         ];
     }
@@ -41,10 +41,10 @@ class UpdateUserRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'nama.string' => 'Nama harus berupa teks',
+            'name.string' => 'Nama harus berupa teks',
             'email.email' => 'Format email tidak valid',
             'email.unique' => 'Email sudah digunakan',
-            'role.in' => 'Role harus: user, admin_ruangan, atau GA',
+            'role.in' => 'Role harus: user, room_admin, atau GA',
         ];
     }
 }

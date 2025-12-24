@@ -14,17 +14,17 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validated = $request->validate([
-            'nama' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
-            'divisi' => 'nullable|string|max:255',
+            'division' => 'nullable|string|max:255',
         ]);
 
         $user = User::create([
-            'nama' => $validated['nama'],
+            'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'divisi' => $validated['divisi'] ?? null,
+            'division' => $validated['division'] ?? null,
             'role' => 'user',
         ]);
 
@@ -127,7 +127,7 @@ class AuthController extends Controller
             } else {
                 // Create new user
                 $user = User::create([
-                    'nama' => $googleUser->name,
+                    'name' => $googleUser->name,
                     'email' => $googleUser->email,
                     'google_id' => $googleUser->id,
                     'email_verified_at' => now(),
@@ -177,7 +177,7 @@ class AuthController extends Controller
                 }
             } else {
                 $user = User::create([
-                    'nama' => $microsoftUser->name,
+                    'name' => $microsoftUser->name,
                     'email' => $microsoftUser->email,
                     'microsoft_id' => $microsoftUser->id,
                     'email_verified_at' => now(),

@@ -15,7 +15,7 @@ class RoomRequestController extends Controller
      */
     public function index( Request $request )
     {
-        $query = RoomRequest::with(['user:id_user,nama,email,divisi', 'assignedBy:id_user,nama', 'booking.room']);
+        $query = RoomRequest::with(['user:id_user,name,email,division', 'assignedBy:id_user,name', 'booking.room']);
 
         // Filter by status
         if ($request->has('status')) {
@@ -37,7 +37,7 @@ class RoomRequestController extends Controller
             $query->upcoming();
         }
 
-        $requests = $query->orderBy('tanggal')->orderBy('jam_mulai')->get();
+        $requests = $query->orderBy('date')->orderBy('start_time')->get();
 
         return response()->json([
             'success' => true,
@@ -59,13 +59,13 @@ class RoomRequestController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nama_peminjam' => 'required|string|max:255',
-            'kapasitas_dibutuhkan' => 'required|integer|min:1',
-            'kebutuhan' => 'required|string',
+            // 'nama_peminjam' => 'required|string|max:255',
+            'required_capacity' => 'required|integer|min:1',
+            'purpose' => 'required|string',
             'notes' => 'nullable|string',
-            'tanggal' => 'required|date|after_or_equal:today',
-            'jam_mulai' => 'required|date_format:H:i',
-            'jam_selesai' => 'required|date_format:H:i|after:jam_mulai',
+            'date' => 'required|date|after_or_equal:today',
+            'start_time' => 'required|date_format:H:i',
+            'end_time' => 'required|date_format:H:i|after:start_time',
         ]);
 
         $validated['id_user'] = auth()->id();
@@ -129,13 +129,13 @@ class RoomRequestController extends Controller
         }
 
         $validated = $request->validate([
-            'nama_peminjam' => 'string|max:255',
-            'kapasitas_dibutuhkan' => 'integer|min:1',
-            'kebutuhan' => 'string',
+            // 'nama_peminjam' => 'string|max:255',
+            'required_capacity' => 'integer|min:1',
+            'purpose' => 'string',
             'notes' => 'nullable|string',
-            'tanggal' => 'date|after_or_equal:today',
-            'jam_mulai' => 'date_format:H:i',
-            'jam_selesai' => 'date_format:H:i|after:jam_mulai',
+            'date' => 'date|after_or_equal:today',
+            'start_time' => 'date_format:H:i',
+            'end_time' => 'date_format:H:i|after:start_time',
         ]);
 
         $oldValues = $roomRequest->toArray();
@@ -208,7 +208,7 @@ class RoomRequestController extends Controller
 
         $room = Room::findOrFail($validated['id_room']);
 
-        if (!$room->isAvailableAt($roomRequest->tanggal, $roomRequest->jam_mulai, $roomRequest->jam_selesai)) {
+        if (!$room->isAvailableAt($roomRequest->date, $roomRequest->start_time, $roomRequest->end_time)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Room is not available at the requested time',
@@ -223,9 +223,9 @@ class RoomRequestController extends Controller
         $booking = $roomRequest->booking()->create([
             'id_room' => $room->id_room,
             'booked_by' => auth()->id(),
-            'tanggal' => $roomRequest->tanggal,
-            'jam_mulai' => $roomRequest->jam_mulai,
-            'jam_selesai' => $roomRequest->jam_selesai,
+            'date' => $roomRequest->date,
+            'start_time' => $roomRequest->start_time,
+            'end_time' => $roomRequest->end_time,
         ]);
 
         AuditLog::log('approve', 'room_requests', $roomRequest->id_request,
@@ -262,7 +262,7 @@ class RoomRequestController extends Controller
     //     $room = Room::findOrFail($validated['id_room']);
 
     //     // Check room availability
-    //     if (!$room->isAvailableAt($roomRequest->tanggal, $roomRequest->jam_mulai, $roomRequest->jam_selesai)) {
+    //     if (!$room->isAvailableAt($roomRequest->date, $roomRequest->start_time, $roomRequest->end_time)) {
     //         return response()->json([
     //             'success' => false,
     //             'message' => 'Room is not available at the requested time',
@@ -279,9 +279,9 @@ class RoomRequestController extends Controller
     //     $booking = $roomRequest->booking()->create([
     //         'id_room' => $room->id_room,
     //         'booked_by' => auth()->id(),
-    //         'tanggal' => $roomRequest->tanggal,
-    //         'jam_mulai' => $roomRequest->jam_mulai,
-    //         'jam_selesai' => $roomRequest->jam_selesai,
+    //         'date' => $roomRequest->date,
+    //         'start_time' => $roomRequest->start_time,
+    //         'end_time' => $roomRequest->end_time,
     //     ]);
 
     //     // Update room status (akan di-handle di observer/job)
@@ -382,13 +382,13 @@ class RoomRequestController extends Controller
         $roomRequest = RoomRequest::findOrFail($id);
 
         $rooms = Room::available()
-                     ->byCapacity($roomRequest->kapasitas_dibutuhkan)
+                     ->byCapacity($roomRequest->required_capacity)
                      ->get()
                      ->filter(function ($room) use ($roomRequest) {
                          return $room->isAvailableAt(
-                             $roomRequest->tanggal,
-                             $roomRequest->jam_mulai,
-                             $roomRequest->jam_selesai
+                             $roomRequest->date,
+                             $roomRequest->start_time,
+                             $roomRequest->end_time
                          );
                      })
                      ->values();

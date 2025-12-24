@@ -13,13 +13,13 @@ class RoomBooking extends Model
         'id_request',
         'id_room',
         'booked_by',
-        'tanggal',
-        'jam_mulai',
-        'jam_selesai',
+        'date',
+        'start_time',
+        'end_time',
     ];
 
     protected $casts = [
-        'tanggal' => 'date',
+        'date' => 'date',
     ];
 
     // ============================================
@@ -62,12 +62,12 @@ class RoomBooking extends Model
 
     public function scopeToday($query)
     {
-        return $query->whereDate('tanggal', today());
+        return $query->whereDate('date', today());
     }
 
     public function scopeUpcoming($query)
     {
-        return $query->where('tanggal', '>=', today());
+        return $query->where('date', '>=', today());
     }
 
     public function scopeByRoom($query, $roomId)
@@ -77,12 +77,12 @@ class RoomBooking extends Model
 
     public function scopeByDate($query, $date)
     {
-        return $query->whereDate('tanggal', $date);
+        return $query->whereDate('date', $date);
     }
 
     public function scopeBetweenDates($query, $startDate, $endDate)
     {
-        return $query->whereBetween('tanggal', [$startDate, $endDate]);
+        return $query->whereBetween('date', [$startDate, $endDate]);
     }
 
     // ============================================
@@ -91,17 +91,17 @@ class RoomBooking extends Model
 
     public function isToday(): bool
     {
-        return $this->tanggal->isToday();
+        return $this->date->isToday();
     }
 
     public function isPast(): bool
     {
-        return $this->tanggal->isPast();
+        return $this->date->isPast();
     }
 
     public function isUpcoming(): bool
     {
-        return $this->tanggal->isFuture();
+        return $this->date->isFuture();
     }
 
     public function isHappening(): bool
@@ -111,7 +111,7 @@ class RoomBooking extends Model
         }
 
         $now = now()->format('H:i:s');
-        return $now >= $this->jam_mulai && $now <= $this->jam_selesai;
+        return $now >= $this->start_time && $now <= $this->end_time;
     }
 
     // Get user yang booking (dari request)

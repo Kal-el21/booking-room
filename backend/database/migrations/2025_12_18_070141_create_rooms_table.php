@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('rooms', function (Blueprint $table) {
             $table->id('id_room');
-            $table->string('nama_ruangan');
-            $table->integer('kapasitas');
-            $table->string('lokasi'); // termasuk lantai
-            $table->text('deskripsi')->nullable(); // fasilitas dijelaskan di sini
+            $table->string('room_name');
+            $table->integer('capacity');
+            $table->string('location'); // termasuk lantai
+            $table->text('description')->nullable(); // fasilitas dijelaskan di sini
             $table->enum('status', ['available', 'occupied', 'maintenance'])->default('available');
             $table->boolean('is_active')->default(true);
             $table->foreignId('created_by')->constrained('users', 'id_user')->onDelete('cascade');

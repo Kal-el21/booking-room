@@ -41,7 +41,7 @@ class SendBookingConfirmationJob implements ShouldQueue
             'id_user' => $user->id_user,
             'id_booking' => $this->booking->id_booking,
             'title' => 'Booking Dikonfirmasi',
-            'message' => "Booking ruangan {$room->nama_ruangan} untuk tanggal {$this->booking->tanggal->format('d/m/Y')} jam {$this->booking->jam_mulai} - {$this->booking->jam_selesai} telah dikonfirmasi.",
+            'message' => "Booking ruangan {$room->room_name} untuk tanggal {$this->booking->date->format('d/m/Y')} jam {$this->booking->start_time} - {$this->booking->end_time} telah dikonfirmasi.",
             'type' => 'booking_confirmed',
             'channel' => 'both',
             'sent_at' => now(),
@@ -59,7 +59,7 @@ class SendBookingConfirmationJob implements ShouldQueue
     private function createNotificationSchedules()
     {
         $user = $this->booking->request->user;
-        $bookingDateTime = Carbon::parse($this->booking->tanggal . ' ' . $this->booking->jam_mulai);
+        $bookingDateTime = Carbon::parse($this->booking->date . ' ' . $this->booking->start_time);
 
         // 24 hours before
         if ($user->preference->shouldNotify('24h_before')) {

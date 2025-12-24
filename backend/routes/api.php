@@ -80,11 +80,17 @@ Route::middleware('auth:sanctum')->group(function () {
     // ADMIN RUANGAN ROUTES
     // ============================================
 
-    Route::middleware('role:admin_ruangan')->group(function () {
+    Route::middleware('role:room_admin')->group(function () {
         // Room Management
         Route::post('/rooms', [RoomController::class, 'store']);
         Route::put('/rooms/{id}', [RoomController::class, 'update']);
         Route::delete('/rooms/{id}', [RoomController::class, 'destroy']);
+
+        // User Management
+        Route::get('/users', [UserController::class, 'index']);
+        Route::get('/users/{id}', [UserController::class, 'show']);
+        Route::put('/users/{id}', [UserController::class, 'update']);
+        Route::delete('/users/{id}', [UserController::class, 'destroy']);
     });
 
     // ============================================
@@ -100,11 +106,6 @@ Route::middleware('auth:sanctum')->group(function () {
         // Booking Management
         Route::delete('/bookings/{id}', [BookingController::class, 'destroy']);
 
-        // User Management
-        Route::get('/users', [UserController::class, 'index']);
-        Route::get('/users/{id}', [UserController::class, 'show']);
-        Route::put('/users/{id}', [UserController::class, 'update']);
-        Route::delete('/users/{id}', [UserController::class, 'destroy']);
 
         // Advanced Dashboard
         Route::get('/dashboard/room-utilization', [DashboardController::class, 'getRoomUtilization']);

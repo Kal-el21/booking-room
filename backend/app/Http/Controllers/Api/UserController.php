@@ -28,13 +28,13 @@ class UserController extends Controller
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('nama', 'like', "%{$search}%")
+                $q->where('name', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('divisi', 'like', "%{$search}%");
+                  ->orWhere('division', 'like', "%{$search}%");
             });
         }
 
-        $users = $query->orderBy('nama')->paginate($request->get('per_page', 20));
+        $users = $query->orderBy('name')->paginate($request->get('per_page', 20));
 
         return response()->json([
             'success' => true,
@@ -68,14 +68,14 @@ class UserController extends Controller
         }
 
         $validated = $request->validate([
-            'nama' => 'string|max:255',
-            'divisi' => 'nullable|string|max:255',
+            'name' => 'string|max:255',
+            'division' => 'nullable|string|max:255',
             'email' => 'email|unique:users,email,' . $id . ',id_user',
         ]);
 
         // Only GA can update role and is_active
         if (auth()->user()->isGA()) {
-            $validated['role'] = $request->validate(['role' => 'in:user,admin_ruangan,GA'])['role'] ?? $user->role;
+            $validated['role'] = $request->validate(['role' => 'in:user,room_admin,GA'])['role'] ?? $user->role;
             $validated['is_active'] = $request->validate(['is_active' => 'boolean'])['is_active'] ?? $user->is_active;
         }
 
@@ -152,7 +152,7 @@ class UserController extends Controller
         // Check if user has upcoming bookings
         $hasUpcomingBookings = $user->roomRequests()
                                     ->whereIn('status', ['pending', 'approved'])
-                                    ->where('tanggal', '>=', today())
+                                    ->where('date', '>=', today())
                                     ->exists();
 
         if ($hasUpcomingBookings) {

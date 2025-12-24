@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id('id_user');
-            $table->string('nama');
+            $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable(); // nullable untuk OAuth users
-            $table->enum('role', ['user', 'admin_ruangan', 'GA'])->default('user');
-            $table->string('divisi')->nullable();
+            $table->enum('role', ['user', 'room_admin', 'GA'])->default('user');
+            $table->string('division')->nullable();
             $table->boolean('is_active')->default(true);
             $table->string('google_id')->nullable()->unique();
             $table->string('microsoft_id')->nullable()->unique();

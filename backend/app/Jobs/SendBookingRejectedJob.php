@@ -38,7 +38,7 @@ class SendBookingRejectedJob implements ShouldQueue
             'id_user' => $user->id_user,
             'id_booking' => null,
             'title' => 'Request Ditolak',
-            'message' => "Request booking untuk tanggal {$this->request->tanggal->format('d/m/Y')} telah ditolak. Alasan: {$this->request->rejected_reason}",
+            'message' => "Request booking untuk tanggal {$this->request->date->format('d/m/Y')} telah ditolak. Alasan: {$this->request->rejected_reason}",
             'type' => 'booking_confirmed',
             'channel' => 'both',
             'sent_at' => now(),

@@ -70,9 +70,9 @@ class SendBookingReminderJob implements ShouldQueue
 
         $time = $timeMap[$type] ?? 'beberapa saat';
 
-        return "Reminder: Booking ruangan {$room->nama_ruangan} akan dimulai dalam {$time}. " .
-               "Tanggal: {$booking->tanggal->format('d/m/Y')}, " .
-               "Jam: {$booking->jam_mulai} - {$booking->jam_selesai}. " .
-               "Lokasi: {$room->lokasi}";
+        return "Reminder: Booking ruangan {$room->room_name} akan dimulai dalam {$time}. " .
+               "Tanggal: {$booking->date->format('d/m/Y')}, " .
+               "Jam: {$booking->start_time} - {$booking->end_time}. " .
+               "Location: {$room->location}";
     }
 }

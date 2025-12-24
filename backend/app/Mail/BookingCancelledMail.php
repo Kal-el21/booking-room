@@ -61,9 +61,9 @@ class BookingCancelledMail extends Mailable
                     ->view('emails.booking-cancelled')
                     ->with([
                         'roomName' => $this->bookingData['room_name'],
-                        'date' => $this->bookingData['tanggal'],
-                        'timeStart' => $this->bookingData['jam_mulai'],
-                        'timeEnd' => $this->bookingData['jam_selesai'],
+                        'date' => $this->bookingData['date'],
+                        'timeStart' => $this->bookingData['start_time'],
+                        'timeEnd' => $this->bookingData['end_time'],
                         'cancelledBy' => $this->cancelledBy,
                     ]);
     }

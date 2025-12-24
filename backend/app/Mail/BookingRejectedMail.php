@@ -58,14 +58,14 @@ class BookingRejectedMail extends Mailable
         return $this->subject('Request Booking Ruangan Ditolak')
                     ->view('emails.booking-rejected')
                     ->with([
-                        'userName' => $this->request->user->nama,
-                        'date' => $this->request->tanggal->format('d F Y'),
-                        'timeStart' => $this->request->jam_mulai,
-                        'timeEnd' => $this->request->jam_selesai,
-                        'capacity' => $this->request->kapasitas_dibutuhkan,
-                        'purpose' => $this->request->kebutuhan,
+                        'userName' => $this->request->user->name,
+                        'date' => $this->request->date->format('d F Y'),
+                        'timeStart' => $this->request->start_time,
+                        'timeEnd' => $this->request->end_time,
+                        'capacity' => $this->request->required_capacity,
+                        'purpose' => $this->request->purpose,
                         'rejectedReason' => $this->request->rejected_reason,
-                        'rejectedBy' => $this->request->assignedBy->nama ?? 'Admin',
+                        'rejectedBy' => $this->request->assignedBy->name ?? 'Admin',
                     ]);
     }
 }

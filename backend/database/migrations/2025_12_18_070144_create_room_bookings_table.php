@@ -16,15 +16,15 @@ return new class extends Migration
             $table->foreignId('id_request')->constrained('room_requests', 'id_request')->onDelete('cascade');
             $table->foreignId('id_room')->constrained('rooms', 'id_room')->onDelete('cascade');
             $table->foreignId('booked_by')->constrained('users', 'id_user')->onDelete('cascade'); // GA yang booking
-            $table->date('tanggal');
-            $table->time('jam_mulai');
-            $table->time('jam_selesai');
+            $table->date('date');
+            $table->time('start_time');
+            $table->time('end_time');
             $table->timestamps();
             $table->softDeletes();
 
-            $table->index('tanggal');
+            $table->index('date');
             $table->index('id_room');
-            $table->index(['id_room', 'tanggal']); // untuk cek availability
+            $table->index(['id_room', 'date']); // untuk cek availability
         });
     }
 

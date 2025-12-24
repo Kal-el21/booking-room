@@ -11,7 +11,7 @@ class StoreRoomRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check() && (auth()->user()->isAdminRuangan() || auth()->user()->isGA());
+        return auth()->check() && (auth()->user()->isRoomAdmin() || auth()->user()->isGA());
     }
 
     /**
@@ -22,10 +22,10 @@ class StoreRoomRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nama_ruangan' => 'required|string|max:255',
-            'kapasitas' => 'required|integer|min:1|max:1000',
-            'lokasi' => 'required|string|max:255',
-            'deskripsi' => 'nullable|string|max:1000',
+            'room_name' => 'required|string|max:255',
+            'capacity' => 'required|integer|min:1|max:1000',
+            'location' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
             'status' => 'nullable|in:available,occupied,maintenance',
             'is_active' => 'nullable|boolean',
         ];
@@ -34,12 +34,12 @@ class StoreRoomRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'nama_ruangan.required' => 'Nama ruangan harus diisi',
-            'kapasitas.required' => 'Kapasitas harus diisi',
-            'kapasitas.integer' => 'Kapasitas harus berupa angka',
-            'kapasitas.min' => 'Kapasitas minimal 1 orang',
-            'kapasitas.max' => 'Kapasitas maksimal 1000 orang',
-            'lokasi.required' => 'Lokasi harus diisi',
+            'room_name.required' => 'Nama ruangan harus diisi',
+            'capacity.required' => 'Kapasitas harus diisi',
+            'capacity.integer' => 'Kapasitas harus berupa angka',
+            'capacity.min' => 'Kapasitas minimal 1 orang',
+            'capacity.max' => 'Kapasitas maksimal 1000 orang',
+            'location.required' => 'Lokasi harus diisi',
             'status.in' => 'Status harus: available, occupied, atau maintenance',
         ];
     }

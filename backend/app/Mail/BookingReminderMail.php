@@ -71,12 +71,12 @@ class BookingReminderMail extends Mailable
         return $this->subject("Reminder: Booking Ruangan dalam {$timeText}")
                     ->view('emails.booking-reminder')
                     ->with([
-                        'userName' => $booking->request->user->nama,
-                        'roomName' => $booking->room->nama_ruangan,
-                        'location' => $booking->room->lokasi,
-                        'date' => $booking->tanggal->format('d F Y'),
-                        'timeStart' => $booking->jam_mulai,
-                        'timeEnd' => $booking->jam_selesai,
+                        'userName' => $booking->request->user->name,
+                        'roomName' => $booking->room->room_name,
+                        'location' => $booking->room->location,
+                        'date' => $booking->date->format('d F Y'),
+                        'timeStart' => $booking->start_time,
+                        'timeEnd' => $booking->end_time,
                         'reminderTime' => $timeText,
                     ]);
     }

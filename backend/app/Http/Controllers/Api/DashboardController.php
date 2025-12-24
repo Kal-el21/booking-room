@@ -18,8 +18,8 @@ class DashboardController extends Controller
 
         if ($user->isUser()) {
             return $this->getUserStats($user);
-        } elseif ($user->isAdminRuangan()) {
-            return $this->getAdminRuanganStats($user);
+        } elseif ($user->isRoomAdmin()) {
+            return $this->getRoomAdminStats($user);
         } elseif ($user->isGA()) {
             return $this->getGAStats();
         }
@@ -42,8 +42,8 @@ class DashboardController extends Controller
             })
             ->upcoming()
             ->with(['room', 'request'])
-            ->orderBy('tanggal')
-            ->orderBy('jam_mulai')
+            ->orderBy('date')
+            ->orderBy('start_time')
             ->limit(5)
             ->get();
 
@@ -56,7 +56,7 @@ class DashboardController extends Controller
         ]);
     }
 
-    private function getAdminRuanganStats($user)
+    private function getRoomAdminStats($user)
     {
         $stats = [
             'total_rooms' => $user->managedRooms()->count(),
@@ -93,15 +93,15 @@ class DashboardController extends Controller
         $pendingRequests = RoomRequest::pending()
                                       ->upcoming()
                                       ->with(['user'])
-                                      ->orderBy('tanggal')
-                                      ->orderBy('jam_mulai')
+                                      ->orderBy('date')
+                                      ->orderBy('start_time')
                                       ->limit(10)
                                       ->get();
 
         // Room utilization (bookings today)
         $todayBookings = RoomBooking::today()
                                     ->with(['room', 'request.user'])
-                                    ->orderBy('jam_mulai')
+                                    ->orderBy('start_time')
                                     ->get();
 
         return response()->json([
@@ -136,8 +136,8 @@ class DashboardController extends Controller
 
             // Calculate total booked hours
             $totalHours = $room->bookings->sum(function ($booking) {
-                $start = Carbon::parse($booking->jam_mulai);
-                $end = Carbon::parse($booking->jam_selesai);
+                $start = Carbon::parse($booking->start_time);
+                $end = Carbon::parse($booking->end_time);
                 return $start->diffInHours($end);
             });
 
@@ -153,7 +153,7 @@ class DashboardController extends Controller
 
             return [
                 'room_id' => $room->id_room,
-                'room_name' => $room->nama_ruangan,
+                'room_name' => $room->room_name,
                 'total_bookings' => $totalBookings,
                 'total_hours' => $totalHours,
                 'utilization_rate' => round($utilizationRate, 2),
@@ -173,7 +173,7 @@ class DashboardController extends Controller
 
         $popularRooms = Room::withCount([
             'bookings' => function ($query) {
-                $query->where('tanggal', '>=', Carbon::now()->subMonth());
+                $query->where('date', '>=', Carbon::now()->subMonth());
             }
         ])
         ->orderBy('bookings_count', 'desc')

@@ -45,7 +45,7 @@ class SendBookingCancellationJob implements ShouldQueue
             'id_user' => $user->id_user,
             'id_booking' => null,
             'title' => 'Booking Dibatalkan',
-            'message' => "Booking ruangan {$this->bookingData['room_name']} untuk tanggal {$this->bookingData['tanggal']} jam {$this->bookingData['jam_mulai']} - {$this->bookingData['jam_selesai']} telah dibatalkan.",
+            'message' => "Booking ruangan {$this->bookingData['room_name']} untuk tanggal {$this->bookingData['date']} jam {$this->bookingData['start_time']} - {$this->bookingData['end_time']} telah dibatalkan.",
             'type' => 'cancellation',
             'channel' => 'both',
             'sent_at' => now(),

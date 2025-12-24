@@ -37,9 +37,9 @@ class UpdateRoomStatus extends Command
         foreach ($rooms as $room) {
             // Check if room has active booking right now
             $activeBooking = RoomBooking::where('id_room', $room->id_room)
-                                       ->where('tanggal', $today)
-                                       ->where('jam_mulai', '<=', $currentTime)
-                                       ->where('jam_selesai', '>=', $currentTime)
+                                       ->where('date', $today)
+                                       ->where('start_time', '<=', $currentTime)
+                                       ->where('end_time', '>=', $currentTime)
                                        ->exists();
 
             if ($activeBooking) {

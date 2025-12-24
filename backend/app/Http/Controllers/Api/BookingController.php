@@ -38,7 +38,7 @@ class BookingController extends Controller
             $query->today();
         }
 
-        $bookings = $query->orderBy('tanggal')->orderBy('jam_mulai')->get();
+        $bookings = $query->orderBy('date')->orderBy('start_time')->get();
 
         return response()->json([
             'success' => true,
@@ -62,22 +62,22 @@ class BookingController extends Controller
             $query->byRoom($request->room_id);
         }
 
-        $bookings = $query->orderBy('tanggal')->orderBy('jam_mulai')->get();
+        $bookings = $query->orderBy('date')->orderBy('start_time')->get();
 
         // Format untuk FullCalendar
         $events = $bookings->map(function ($booking) {
             return [
                 'id' => $booking->id_booking,
-                'title' => $booking->request->nama_peminjam,
-                'start' => $booking->tanggal->format('Y-m-d') . 'T' . $booking->jam_mulai,
-                'end' => $booking->tanggal->format('Y-m-d') . 'T' . $booking->jam_selesai,
+                'title' => $booking->request->borrower_name . ' - ' . $booking->room->room_name,
+                'start' => $booking->date->format('Y-m-d') . 'T' . $booking->start_time,
+                'end' => $booking->date->format('Y-m-d') . 'T' . $booking->end_time,
                 'resourceId' => $booking->id_room,
                 'extendedProps' => [
-                    'room_name' => $booking->room->nama_ruangan,
-                    'user_name' => $booking->request->user->nama,
+                    'room_name' => $booking->room->room_name,
+                    'user_name' => $booking->request->user->name,
                     'user_email' => $booking->request->user->email,
-                    'divisi' => $booking->request->user->divisi,
-                    'kebutuhan' => $booking->request->kebutuhan,
+                    'division' => $booking->request->user->division,
+                    'purpose' => $booking->request->purpose,
                 ],
             ];
         });
@@ -114,14 +114,14 @@ class BookingController extends Controller
 
         // Collect data sebelum delete
         $bookingData = [
-            'room_name' => $booking->room->nama_ruangan,
-            'tanggal' => $booking->tanggal->format('d/m/Y'),
-            'jam_mulai' => $booking->jam_mulai,
-            'jam_selesai' => $booking->jam_selesai,
+            'room_name' => $booking->room->room_name,
+            'date' => $booking->date->format('d/m/Y'),
+            'start_time' => $booking->start_time,
+            'end_time' => $booking->end_time,
         ];
 
         $userId = $booking->request->user->id_user;
-        $cancelledBy = auth()->user()->nama;
+        $cancelledBy = auth()->user()->name;
 
         // Update request status
         $booking->request->update(['status' => 'cancelled']);

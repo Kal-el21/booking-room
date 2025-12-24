@@ -61,15 +61,15 @@ class BookingConfirmedMail extends Mailable
         return $this->subject('Booking Ruangan Dikonfirmasi')
                     ->view('emails.booking-confirmed')
                     ->with([
-                        'userName' => $booking->request->user->nama,
-                        'roomName' => $booking->room->nama_ruangan,
-                        'location' => $booking->room->lokasi,
-                        'date' => $booking->tanggal->format('d F Y'),
-                        'timeStart' => $booking->jam_mulai,
-                        'timeEnd' => $booking->jam_selesai,
-                        'capacity' => $booking->room->kapasitas,
-                        'description' => $booking->room->deskripsi,
-                        'purpose' => $booking->request->kebutuhan,
+                        'userName' => $booking->request->user->name,
+                        'roomName' => $booking->room->room_name,
+                        'location' => $booking->room->location,
+                        'date' => $booking->date->format('d F Y'),
+                        'timeStart' => $booking->start_time,
+                        'timeEnd' => $booking->end_time,
+                        'capacity' => $booking->room->capacity,
+                        'description' => $booking->room->description,
+                        'purpose' => $booking->request->purpose,
                     ]);
     }
 }

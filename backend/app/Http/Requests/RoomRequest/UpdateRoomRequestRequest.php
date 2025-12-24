@@ -23,28 +23,28 @@ class UpdateRoomRequestRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nama_peminjam' => 'sometimes|string|max:255',
-            'kapasitas_dibutuhkan' => 'sometimes|integer|min:1|max:1000',
-            'kebutuhan' => 'sometimes|string|max:500',
+            // 'nama_peminjam' => 'sometimes|string|max:255',
+            'required_capacity' => 'sometimes|integer|min:1|max:1000',
+            'purpose' => 'sometimes|string|max:500',
             'notes' => 'nullable|string|max:1000',
-            'tanggal' => 'sometimes|date|after_or_equal:today',
-            'jam_mulai' => 'sometimes|date_format:H:i',
-            'jam_selesai' => 'sometimes|date_format:H:i|after:jam_mulai',
+            'date' => 'sometimes|date|after_or_equal:today',
+            'start_time' => 'sometimes|date_format:H:i',
+            'end_time' => 'sometimes|date_format:H:i|after:start_time',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'nama_peminjam.string' => 'Nama peminjam harus berupa teks',
-            'kapasitas_dibutuhkan.integer' => 'Kapasitas harus berupa angka',
-            'kapasitas_dibutuhkan.min' => 'Kapasitas minimal 1 orang',
-            'kebutuhan.string' => 'Keperluan harus berupa teks',
-            'tanggal.date' => 'Format tanggal tidak valid',
-            'tanggal.after_or_equal' => 'Tanggal tidak boleh di masa lalu',
-            'jam_mulai.date_format' => 'Format jam harus HH:mm',
-            'jam_selesai.date_format' => 'Format jam harus HH:mm',
-            'jam_selesai.after' => 'Jam selesai harus lebih besar dari jam mulai',
+            // 'nama_peminjam.string' => 'Nama peminjam harus berupa teks',
+            'required_capacity.integer' => 'Kapasitas harus berupa angka',
+            'required_capacity.min' => 'Kapasitas minimal 1 orang',
+            'purpose.string' => 'Keperluan harus berupa teks',
+            'date.date' => 'Format tanggal tidak valid',
+            'date.after_or_equal' => 'Tanggal tidak boleh di masa lalu',
+            'start_time.date_format' => 'Format jam harus HH:mm',
+            'end_time.date_format' => 'Format jam harus HH:mm',
+            'end_time.after' => 'Jam selesai harus lebih besar dari jam mulai',
         ];
     }
 }

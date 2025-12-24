@@ -24,11 +24,11 @@ class User extends Authenticatable
     protected $primaryKey = 'id_user';
 
     protected $fillable = [
-        'nama',
+        'name',
         'email',
         'password',
         'role',
-        'divisi',
+        'division',
         'is_active',
         'google_id',
         'microsoft_id',
@@ -125,9 +125,9 @@ class User extends Authenticatable
         return $this->role === 'user';
     }
 
-    public function isAdminRuangan(): bool
+    public function isRoomAdmin(): bool
     {
-        return $this->role === 'admin_ruangan';
+        return $this->role === 'room_admin';
     }
 
     public function isGA(): bool

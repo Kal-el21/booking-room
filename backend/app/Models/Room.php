@@ -10,17 +10,17 @@ class Room extends Model
     protected $primaryKey = 'id_room';
 
     protected $fillable = [
-        'nama_ruangan',
-        'kapasitas',
-        'lokasi',
-        'deskripsi',
+        'room_name',
+        'capacity',
+        'location',
+        'description',
         'status',
         'is_active',
         'created_by',
     ];
 
     protected $casts = [
-        'kapasitas' => 'integer',
+        'capacity' => 'integer',
         'is_active' => 'boolean',
     ];
 
@@ -44,17 +44,17 @@ class Room extends Model
     public function activeBookings()
     {
         return $this->hasMany(RoomBooking::class, 'id_room', 'id_room')
-                    ->whereDate('tanggal', today())
-                    ->orderBy('jam_mulai');
+                    ->whereDate('date', today())
+                    ->orderBy('start_time');
     }
 
     // Room punya upcoming bookings
     public function upcomingBookings()
     {
         return $this->hasMany(RoomBooking::class, 'id_room', 'id_room')
-                    ->where('tanggal', '>=', today())
-                    ->orderBy('tanggal')
-                    ->orderBy('jam_mulai');
+                    ->where('date', '>=', today())
+                    ->orderBy('date')
+                    ->orderBy('start_time');
     }
 
     // ============================================
@@ -74,7 +74,7 @@ class Room extends Model
 
     public function scopeByCapacity($query, $minCapacity)
     {
-        return $query->where('kapasitas', '>=', $minCapacity);
+        return $query->where('capacity', '>=', $minCapacity);
     }
 
     // ============================================
@@ -97,20 +97,20 @@ class Room extends Model
     }
 
     // Check apakah ruangan tersedia di waktu tertentu
-    public function isAvailableAt($tanggal, $jamMulai, $jamSelesai, $excludeBookingId = null)
+    public function isAvailableAt($date, $startDate, $endDate, $excludeBookingId = null)
     {
         if (!$this->isAvailable()) {
             return false;
         }
 
         $query = $this->bookings()
-            ->where('tanggal', $tanggal)
-            ->where(function ($q) use ($jamMulai, $jamSelesai) {
-                $q->whereBetween('jam_mulai', [$jamMulai, $jamSelesai])
-                  ->orWhereBetween('jam_selesai', [$jamMulai, $jamSelesai])
-                  ->orWhere(function ($q2) use ($jamMulai, $jamSelesai) {
-                      $q2->where('jam_mulai', '<=', $jamMulai)
-                         ->where('jam_selesai', '>=', $jamSelesai);
+            ->where('date', $date)
+            ->where(function ($q) use ($startDate, $endDate) {
+                $q->whereBetween('start_time', [$startDate, $endDate])
+                  ->orWhereBetween('end_time', [$startDate, $endDate])
+                  ->orWhere(function ($q2) use ($startDate, $endDate) {
+                      $q2->where('start_time', '<=', $startDate)
+                         ->where('end_time', '>=', $endDate);
                   });
             });
 

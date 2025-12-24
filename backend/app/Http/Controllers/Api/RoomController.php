@@ -14,7 +14,7 @@ class RoomController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Room::with('creator:id_user,nama');
+        $query = Room::with('creator:id_user,name');
 
         // Filter by status
         if ($request->has('status')) {
@@ -35,12 +35,12 @@ class RoomController extends Controller
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('nama_ruangan', 'like', "%{$search}%")
-                  ->orWhere('lokasi', 'like', "%{$search}%");
+                $q->where('room_name', 'like', "%{$search}%")
+                  ->orWhere('location', 'like', "%{$search}%");
             });
         }
 
-        $rooms = $query->orderBy('nama_ruangan')->get();
+        $rooms = $query->orderBy('room_name')->get();
 
         return response()->json([
             'success' => true,
@@ -62,10 +62,10 @@ class RoomController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nama_ruangan' => 'required|string|max:255',
-            'kapasitas' => 'required|integer|min:1',
-            'lokasi' => 'required|string|max:255',
-            'deskripsi' => 'nullable|string',
+            'room_name' => 'required|string|max:255',
+            'capacity' => 'required|integer|min:1',
+            'location' => 'required|string|max:255',
+            'description' => 'nullable|string',
             'status' => 'in:available,occupied,maintenance',
             'is_active' => 'boolean',
         ]);
@@ -114,10 +114,10 @@ class RoomController extends Controller
         $room = Room::findOrFail($id);
 
         $validated = $request->validate([
-            'nama_ruangan' => 'string|max:255',
-            'kapasitas' => 'integer|min:1',
-            'lokasi' => 'string|max:255',
-            'deskripsi' => 'nullable|string',
+            'room_name' => 'string|max:255',
+            'capacity' => 'integer|min:1',
+            'location' => 'string|max:255',
+            'description' => 'nullable|string',
             'status' => 'in:available,occupied,maintenance',
             'is_active' => 'boolean',
         ]);
@@ -167,17 +167,17 @@ class RoomController extends Controller
     public function checkAvailability($id, Request $request)
     {
         $request->validate([
-            'tanggal' => 'required|date',
-            'jam_mulai' => 'required|date_format:H:i',
-            'jam_selesai' => 'required|date_format:H:i|after:jam_mulai',
+            'date' => 'required|date',
+            'start_time' => 'required|date_format:H:i',
+            'end_time' => 'required|date_format:H:i|after:start_time',
         ]);
 
         $room = Room::findOrFail($id);
 
         $isAvailable = $room->isAvailableAt(
-            $request->tanggal,
-            $request->jam_mulai,
-            $request->jam_selesai
+            $request->date,
+            $request->start_time,
+            $request->end_time
         );
 
         return response()->json([

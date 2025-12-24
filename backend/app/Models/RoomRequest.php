@@ -11,21 +11,23 @@ class RoomRequest extends Model
 
     protected $fillable = [
         'id_user',
-        'nama_peminjam',
-        'kapasitas_dibutuhkan',
-        'kebutuhan',
+        // 'nama_peminjam',
+        'required_capacity',
+        'purpose',
         'notes',
-        'tanggal',
-        'jam_mulai',
-        'jam_selesai',
+        'date',
+        'start_time',
+        'end_time',
         'status',
         'id_assigned_by',
         'rejected_reason',
     ];
 
+    protected $appends = ['borrower_name'];
+
     protected $casts = [
-        'kapasitas_dibutuhkan' => 'integer',
-        'tanggal' => 'date',
+        'required_capacity' => 'integer',
+        'date' => 'date',
     ];
 
     // ============================================
@@ -71,12 +73,12 @@ class RoomRequest extends Model
 
     public function scopeUpcoming($query)
     {
-        return $query->where('tanggal', '>=', today());
+        return $query->where('date', '>=', today());
     }
 
     public function scopeByDate($query, $date)
     {
-        return $query->whereDate('tanggal', $date);
+        return $query->whereDate('date', $date);
     }
 
     // ============================================
@@ -105,11 +107,16 @@ class RoomRequest extends Model
 
     public function canBeApproved(): bool
     {
-        return $this->isPending() && $this->tanggal >= today();
+        return $this->isPending() && $this->date >= today();
     }
 
     public function canBeCancelled(): bool
     {
-        return $this->isPending() || ($this->isApproved() && $this->tanggal >= today());
+        return $this->isPending() || ($this->isApproved() && $this->date >= today());
+    }
+
+    public function getBorrowerNameAttribute(): string
+    {
+        return $this->user->nama ?? $this->user->name ?? 'Unknown';
     }
 }

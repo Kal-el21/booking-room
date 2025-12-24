@@ -28,51 +28,51 @@ class DatabaseSeeder extends Seeder
         $this->command->info('👥 Creating users...');
 
         $ga = User::create([
-            'nama' => 'GA Admin',
+            'name' => 'GA Admin',
             'email' => 'ga@company.com',
             'password' => Hash::make('password123'),
             'role' => 'GA',
-            'divisi' => 'General Affairs',
+            'division' => 'General Affairs',
             'email_verified_at' => now(),
             'is_active' => true,
         ]);
 
         $adminRuangan = User::create([
-            'nama' => 'Admin Ruangan',
+            'name' => 'Admin Ruangan',
             'email' => 'admin@company.com',
             'password' => Hash::make('password123'),
-            'role' => 'admin_ruangan',
-            'divisi' => 'Facilities',
+            'role' => 'room_admin',
+            'division' => 'Facilities',
             'email_verified_at' => now(),
             'is_active' => true,
         ]);
 
         $user1 = User::create([
-            'nama' => 'John Doe',
+            'name' => 'John Doe',
             'email' => 'user@company.com',
             'password' => Hash::make('password123'),
             'role' => 'user',
-            'divisi' => 'IT',
+            'division' => 'IT',
             'email_verified_at' => now(),
             'is_active' => true,
         ]);
 
         $user2 = User::create([
-            'nama' => 'Jane Smith',
+            'name' => 'Jane Smith',
             'email' => 'jane@company.com',
             'password' => Hash::make('password123'),
             'role' => 'user',
-            'divisi' => 'Marketing',
+            'division' => 'Marketing',
             'email_verified_at' => now(),
             'is_active' => true,
         ]);
 
         $user3 = User::create([
-            'nama' => 'Bob Wilson',
+            'name' => 'Bob Wilson',
             'email' => 'bob@company.com',
             'password' => Hash::make('password123'),
             'role' => 'user',
-            'divisi' => 'Sales',
+            'division' => 'Sales',
             'email_verified_at' => now(),
             'is_active' => true,
         ]);
@@ -85,50 +85,50 @@ class DatabaseSeeder extends Seeder
         $this->command->info('🏢 Creating rooms...');
 
         $room1 = Room::create([
-            'nama_ruangan' => 'Meeting Room A',
-            'kapasitas' => 10,
-            'lokasi' => 'Lantai 3, Gedung Utama',
-            'deskripsi' => 'Ruang meeting dengan proyektor, whiteboard, AC, sound system, WiFi',
+            'room_name' => 'Meeting Room A',
+            'capacity' => 10,
+            'location' => 'Lantai 3, Gedung Utama',
+            'description' => 'Ruang meeting dengan proyektor, whiteboard, AC, sound system, WiFi',
             'status' => 'available',
             'is_active' => true,
             'created_by' => $adminRuangan->id_user,
         ]);
 
         $room2 = Room::create([
-            'nama_ruangan' => 'Meeting Room B',
-            'kapasitas' => 20,
-            'lokasi' => 'Lantai 3, Gedung Utama',
-            'deskripsi' => 'Ruang meeting besar dengan proyektor, whiteboard, AC, sound system, video conference, WiFi',
+            'room_name' => 'Meeting Room B',
+            'capacity' => 20,
+            'location' => 'Lantai 3, Gedung Utama',
+            'description' => 'Ruang meeting besar dengan proyektor, whiteboard, AC, sound system, video conference, WiFi',
             'status' => 'available',
             'is_active' => true,
             'created_by' => $adminRuangan->id_user,
         ]);
 
         $room3 = Room::create([
-            'nama_ruangan' => 'Discussion Room',
-            'kapasitas' => 6,
-            'lokasi' => 'Lantai 2, Gedung Utama',
-            'deskripsi' => 'Ruang diskusi kecil dengan whiteboard, TV, AC, WiFi',
+            'room_name' => 'Discussion Room',
+            'capacity' => 6,
+            'location' => 'Lantai 2, Gedung Utama',
+            'description' => 'Ruang diskusi kecil dengan whiteboard, TV, AC, WiFi',
             'status' => 'available',
             'is_active' => true,
             'created_by' => $adminRuangan->id_user,
         ]);
 
         $room4 = Room::create([
-            'nama_ruangan' => 'Board Room',
-            'kapasitas' => 15,
-            'lokasi' => 'Lantai 4, Gedung Utama',
-            'deskripsi' => 'Ruang rapat direksi dengan meja besar, proyektor, video conference, AC, WiFi, pantry',
+            'room_name' => 'Board Room',
+            'capacity' => 15,
+            'location' => 'Lantai 4, Gedung Utama',
+            'description' => 'Ruang rapat direksi dengan meja besar, proyektor, video conference, AC, WiFi, pantry',
             'status' => 'available',
             'is_active' => true,
             'created_by' => $adminRuangan->id_user,
         ]);
 
         $room5 = Room::create([
-            'nama_ruangan' => 'Training Room',
-            'kapasitas' => 30,
-            'lokasi' => 'Lantai 2, Gedung Annex',
-            'deskripsi' => 'Ruang training dengan proyektor, sound system, AC, WiFi, meja lipat',
+            'room_name' => 'Training Room',
+            'capacity' => 30,
+            'location' => 'Lantai 2, Gedung Annex',
+            'description' => 'Ruang training dengan proyektor, sound system, AC, WiFi, meja lipat',
             'status' => 'available',
             'is_active' => true,
             'created_by' => $adminRuangan->id_user,
@@ -144,13 +144,13 @@ class DatabaseSeeder extends Seeder
         // === APPROVED REQUEST with BOOKING (Past - for history) ===
         $request1 = RoomRequest::create([
             'id_user' => $user1->id_user,
-            'nama_peminjam' => 'Tim IT - Sprint Planning',
-            'kapasitas_dibutuhkan' => 8,
-            'kebutuhan' => 'Sprint planning meeting untuk project baru',
+            // 'nama_peminjam' => 'Tim IT - Sprint Planning',
+            'required_capacity' => 8,
+            'purpose' => 'Sprint planning meeting untuk project baru',
             'notes' => 'Butuh proyektor untuk demo',
-            'tanggal' => Carbon::yesterday(),
-            'jam_mulai' => '09:00:00',
-            'jam_selesai' => '11:00:00',
+            'date' => Carbon::yesterday(),
+            'start_time' => '09:00:00',
+            'end_time' => '11:00:00',
             'status' => 'approved',
             'id_assigned_by' => $ga->id_user,
         ]);
@@ -159,21 +159,21 @@ class DatabaseSeeder extends Seeder
             'id_request' => $request1->id_request,
             'id_room' => $room1->id_room,
             'booked_by' => $ga->id_user,
-            'tanggal' => $request1->tanggal,
-            'jam_mulai' => $request1->jam_mulai,
-            'jam_selesai' => $request1->jam_selesai,
+            'date' => $request1->date,
+            'start_time' => $request1->start_time,
+            'end_time' => $request1->end_time,
         ]);
 
         // === APPROVED REQUEST with BOOKING (Today) ===
         $request2 = RoomRequest::create([
             'id_user' => $user2->id_user,
-            'nama_peminjam' => 'Tim Marketing - Campaign Review',
-            'kapasitas_dibutuhkan' => 12,
-            'kebutuhan' => 'Review campaign Q1 dan planning Q2',
+            // 'nama_peminjam' => 'Tim Marketing - Campaign Review',
+            'required_capacity' => 12,
+            'purpose' => 'Review campaign Q1 dan planning Q2',
             'notes' => 'Mohon sediakan flip chart',
-            'tanggal' => Carbon::today(),
-            'jam_mulai' => '14:00:00',
-            'jam_selesai' => '16:00:00',
+            'date' => Carbon::today(),
+            'start_time' => '14:00:00',
+            'end_time' => '16:00:00',
             'status' => 'approved',
             'id_assigned_by' => $ga->id_user,
         ]);
@@ -182,9 +182,9 @@ class DatabaseSeeder extends Seeder
             'id_request' => $request2->id_request,
             'id_room' => $room2->id_room,
             'booked_by' => $ga->id_user,
-            'tanggal' => $request2->tanggal,
-            'jam_mulai' => $request2->jam_mulai,
-            'jam_selesai' => $request2->jam_selesai,
+            'date' => $request2->date,
+            'start_time' => $request2->start_time,
+            'end_time' => $request2->end_time,
         ]);
 
         // Create notification for today's booking
@@ -192,7 +192,7 @@ class DatabaseSeeder extends Seeder
             'id_user' => $user2->id_user,
             'id_booking' => $booking2->id_booking,
             'title' => 'Booking Dikonfirmasi',
-            'message' => "Booking ruangan {$room2->nama_ruangan} untuk hari ini jam {$request2->jam_mulai} - {$request2->jam_selesai} telah dikonfirmasi.",
+            'message' => "Booking ruangan {$room2->room_name} untuk hari ini jam {$request2->start_time} - {$request2->end_time} telah dikonfirmasi.",
             'type' => 'booking_confirmed',
             'channel' => 'both',
             'is_read' => false,
@@ -202,13 +202,13 @@ class DatabaseSeeder extends Seeder
         // === APPROVED REQUEST with BOOKING (Tomorrow) ===
         $request3 = RoomRequest::create([
             'id_user' => $user3->id_user,
-            'nama_peminjam' => 'Tim Sales - Client Presentation',
-            'kapasitas_dibutuhkan' => 10,
-            'kebutuhan' => 'Presentasi proposal ke klien besar',
+            // 'nama_peminjam' => 'Tim Sales - Client Presentation',
+            'required_capacity' => 10,
+            'purpose' => 'Presentasi proposal ke klien besar',
             'notes' => 'Mohon pastikan video conference berfungsi',
-            'tanggal' => Carbon::tomorrow(),
-            'jam_mulai' => '10:00:00',
-            'jam_selesai' => '12:00:00',
+            'date' => Carbon::tomorrow(),
+            'start_time' => '10:00:00',
+            'end_time' => '12:00:00',
             'status' => 'approved',
             'id_assigned_by' => $ga->id_user,
         ]);
@@ -217,16 +217,16 @@ class DatabaseSeeder extends Seeder
             'id_request' => $request3->id_request,
             'id_room' => $room4->id_room,
             'booked_by' => $ga->id_user,
-            'tanggal' => $request3->tanggal,
-            'jam_mulai' => $request3->jam_mulai,
-            'jam_selesai' => $request3->jam_selesai,
+            'date' => $request3->date,
+            'start_time' => $request3->start_time,
+            'end_time' => $request3->end_time,
         ]);
 
         // Create notification schedules for tomorrow's booking
-        $bookingDateTime = $request3->tanggal
+        $bookingDateTime = $request3->date
                                     ->copy()
-                                    ->setTimeFromTimeString($request3->jam_mulai);
-        // $bookingDateTime = Carbon::parse($request3->tanggal . ' ' . $request3->jam_mulai);
+                                    ->setTimeFromTimeString($request3->start_time);
+        // $bookingDateTime = Carbon::parse($request3->date . ' ' . $request3->start_time);
 
         NotificationSchedule::create([
             'id_booking' => $booking3->id_booking,
@@ -252,50 +252,50 @@ class DatabaseSeeder extends Seeder
         // === PENDING REQUESTS (for GA to process) ===
         $pendingRequest1 = RoomRequest::create([
             'id_user' => $user1->id_user,
-            'nama_peminjam' => 'Tim IT - Code Review',
-            'kapasitas_dibutuhkan' => 6,
-            'kebutuhan' => 'Code review session untuk feature baru',
+            // 'nama_peminjam' => 'Tim IT - Code Review',
+            'required_capacity' => 6,
+            'purpose' => 'Code review session untuk feature baru',
             'notes' => 'Butuh ruang kecil saja',
-            'tanggal' => Carbon::today()->addDays(2),
-            'jam_mulai' => '13:00:00',
-            'jam_selesai' => '15:00:00',
+            'date' => Carbon::today()->addDays(2),
+            'start_time' => '13:00:00',
+            'end_time' => '15:00:00',
             'status' => 'pending',
         ]);
 
         $pendingRequest2 = RoomRequest::create([
             'id_user' => $user2->id_user,
-            'nama_peminjam' => 'Tim Marketing - Brainstorming',
-            'kapasitas_dibutuhkan' => 8,
-            'kebutuhan' => 'Brainstorming ide campaign baru',
+            // 'nama_peminjam' => 'Tim Marketing - Brainstorming',
+            'required_capacity' => 8,
+            'purpose' => 'Brainstorming ide campaign baru',
             'notes' => 'Butuh whiteboard besar',
-            'tanggal' => Carbon::today()->addDays(3),
-            'jam_mulai' => '09:00:00',
-            'jam_selesai' => '11:00:00',
+            'date' => Carbon::today()->addDays(3),
+            'start_time' => '09:00:00',
+            'end_time' => '11:00:00',
             'status' => 'pending',
         ]);
 
         $pendingRequest3 = RoomRequest::create([
             'id_user' => $user3->id_user,
-            'nama_peminjam' => 'Tim Sales - Training',
-            'kapasitas_dibutuhkan' => 25,
-            'kebutuhan' => 'Training produk baru untuk sales team',
+            // 'nama_peminjam' => 'Tim Sales - Training',
+            'required_capacity' => 25,
+            'purpose' => 'Training produk baru untuk sales team',
             'notes' => 'Butuh ruang besar dan sound system',
-            'tanggal' => Carbon::today()->addDays(5),
-            'jam_mulai' => '08:00:00',
-            'jam_selesai' => '12:00:00',
+            'date' => Carbon::today()->addDays(5),
+            'start_time' => '08:00:00',
+            'end_time' => '12:00:00',
             'status' => 'pending',
         ]);
 
         // === REJECTED REQUEST (for user to see rejection) ===
         $rejectedRequest = RoomRequest::create([
             'id_user' => $user1->id_user,
-            'nama_peminjam' => 'Tim IT - Workshop',
-            'kapasitas_dibutuhkan' => 50,
-            'kebutuhan' => 'Workshop internal',
+            // 'nama_peminjam' => 'Tim IT - Workshop',
+            'required_capacity' => 50,
+            'purpose' => 'Workshop internal',
             'notes' => null,
-            'tanggal' => Carbon::today()->addDays(1),
-            'jam_mulai' => '08:00:00',
-            'jam_selesai' => '17:00:00',
+            'date' => Carbon::today()->addDays(1),
+            'start_time' => '08:00:00',
+            'end_time' => '17:00:00',
             'status' => 'rejected',
             'id_assigned_by' => $ga->id_user,
             'rejected_reason' => 'Kapasitas terlalu besar. Ruangan terbesar kami hanya 30 orang. Mohon split menjadi 2 sesi atau gunakan auditorium.',
@@ -306,7 +306,7 @@ class DatabaseSeeder extends Seeder
             'id_user' => $user1->id_user,
             'id_booking' => null,
             'title' => 'Request Ditolak',
-            'message' => "Request booking untuk tanggal {$rejectedRequest->tanggal->format('d/m/Y')} telah ditolak. Alasan: {$rejectedRequest->rejected_reason}",
+            'message' => "Request booking untuk date {$rejectedRequest->date->format('d/m/Y')} telah ditolak. Alasan: {$rejectedRequest->rejected_reason}",
             'type' => 'booking_confirmed',
             'channel' => 'both',
             'is_read' => false,
@@ -360,7 +360,7 @@ class DatabaseSeeder extends Seeder
 
         // // Create GA User
         // $ga = User::create([
-        //     'nama' => 'GA Admin',
+        //     'name' => 'GA Admin',
         //     'email' => 'ga@company.com',
         //     'password' => Hash::make('password123'),
         //     'role' => 'GA',
@@ -370,51 +370,51 @@ class DatabaseSeeder extends Seeder
 
         // // Create Admin Ruangan
         // $adminRuangan = User::create([
-        //     'nama' => 'Admin Ruangan',
+        //     'name' => 'Admin Ruangan',
         //     'email' => 'admin@company.com',
         //     'password' => Hash::make('password123'),
-        //     'role' => 'admin_ruangan',
+        //     'role' => 'room_admin',
         //     'email_verified_at' => now(),
         //     'is_active' => true,
         // ]);
 
         // // Create Regular User
         // $user = User::create([
-        //     'nama' => 'John Doe',
+        //     'name' => 'John Doe',
         //     'email' => 'user@company.com',
         //     'password' => Hash::make('password123'),
         //     'role' => 'user',
-        //     'divisi' => 'IT',
+        //     'division' => 'IT',
         //     'email_verified_at' => now(),
         //     'is_active' => true,
         // ]);
 
         // // Create Sample Rooms
         // Room::create([
-        //     'nama_ruangan' => 'Meeting Room A',
-        //     'kapasitas' => 10,
-        //     'lokasi' => 'Lantai 3, Gedung Utama',
-        //     'deskripsi' => 'Ruang meeting dengan proyektor, whiteboard, AC, sound system',
+        //     'room_name' => 'Meeting Room A',
+        //     'capacity' => 10,
+        //     'location' => 'Lantai 3, Gedung Utama',
+        //     'description' => 'Ruang meeting dengan proyektor, whiteboard, AC, sound system',
         //     'status' => 'available',
         //     'is_active' => true,
         //     'created_by' => $adminRuangan->id_user,
         // ]);
 
         // Room::create([
-        //     'nama_ruangan' => 'Meeting Room B',
-        //     'kapasitas' => 20,
-        //     'lokasi' => 'Lantai 3, Gedung Utama',
-        //     'deskripsi' => 'Ruang meeting besar dengan proyektor, whiteboard, AC, sound system, video conference',
+        //     'room_name' => 'Meeting Room B',
+        //     'capacity' => 20,
+        //     'location' => 'Lantai 3, Gedung Utama',
+        //     'description' => 'Ruang meeting besar dengan proyektor, whiteboard, AC, sound system, video conference',
         //     'status' => 'available',
         //     'is_active' => true,
         //     'created_by' => $adminRuangan->id_user,
         // ]);
 
         // Room::create([
-        //     'nama_ruangan' => 'Discussion Room',
-        //     'kapasitas' => 6,
-        //     'lokasi' => 'Lantai 2, Gedung Utama',
-        //     'deskripsi' => 'Ruang diskusi kecil dengan whiteboard dan AC',
+        //     'room_name' => 'Discussion Room',
+        //     'capacity' => 6,
+        //     'location' => 'Lantai 2, Gedung Utama',
+        //     'description' => 'Ruang diskusi kecil dengan whiteboard dan AC',
         //     'status' => 'available',
         //     'is_active' => true,
         //     'created_by' => $adminRuangan->id_user,
