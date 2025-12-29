@@ -60,7 +60,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         // Check authorization
-        if (auth()->id() !== (int)$id && !auth()->user()->isGA()) {
+        if (auth()->id() !== (int)$id && !auth()->user()->isRoomAdmin()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized',
@@ -74,7 +74,7 @@ class UserController extends Controller
         ]);
 
         // Only GA can update role and is_active
-        if (auth()->user()->isGA()) {
+        if (auth()->user()->isRoomAdmin()) {
             $validated['role'] = $request->validate(['role' => 'in:user,room_admin,GA'])['role'] ?? $user->role;
             $validated['is_active'] = $request->validate(['is_active' => 'boolean'])['is_active'] ?? $user->is_active;
         }
