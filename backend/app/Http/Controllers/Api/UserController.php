@@ -73,10 +73,18 @@ class UserController extends Controller
             'email' => 'email|unique:users,email,' . $id . ',id_user',
         ]);
 
-        // Only GA can update role and is_active
+        // Only Room Admin can update role and is_active
         if (auth()->user()->isRoomAdmin()) {
-            $validated['role'] = $request->validate(['role' => 'in:user,room_admin,GA'])['role'] ?? $user->role;
-            $validated['is_active'] = $request->validate(['is_active' => 'boolean'])['is_active'] ?? $user->is_active;
+            if ($request->has('role')) {
+                $validated['role'] = $request->validate([
+                    'role' => 'in:user,room_admin,GA'
+                ])['role'];
+            }
+            if ($request->has('is_active')) {
+                $validated['is_active'] = $request->validate([
+                    'is_active' => 'boolean'
+                ])['is_active'];
+            }
         }
 
         $user->update($validated);

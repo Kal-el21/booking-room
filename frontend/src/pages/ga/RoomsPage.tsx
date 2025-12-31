@@ -1,24 +1,29 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { roomsApi } from '@/lib/apiService';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner';
 import { ErrorMessage } from '@/components/shared/ErrorMessage';
 import { getStatusColor } from '@/lib/utils';
 import type { Room } from '@/lib/types';
-import { Plus } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-export const AdminRoomsPage = () => {
-  const navigate = useNavigate();
+export const GARoomsPage = () => {
   const [rooms, setRooms] = useState<Room[]>([]);
+  const [filteredRooms, setFilteredRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
 
   useEffect(() => {
     fetchRooms();
   }, []);
+
+  useEffect(() => {
+    filterRooms();
+  }, [rooms, search, statusFilter]);
 
   const fetchRooms = async () => {
     try {
@@ -34,24 +39,56 @@ export const AdminRoomsPage = () => {
     }
   };
 
+  const filterRooms = () => {
+    let filtered = rooms;
+
+    if (search) {
+      filtered = filtered.filter(
+        (room) =>
+          room.room_name.toLowerCase().includes(search.toLowerCase()) ||
+          room.location.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter((room) => room.status === statusFilter);
+    }
+
+    setFilteredRooms(filtered);
+  };
+
   if (loading) return <LoadingSpinner text="Loading rooms..." />;
   if (error) return <ErrorMessage message={error} />;
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Manage Rooms</h1>
-          <p className="text-muted-foreground">Create and manage meeting rooms</p>
-        </div>
-        <Button onClick={() => navigate('/admin/rooms/create')}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Room
-        </Button>
+      <div>
+        <h1 className="text-3xl font-bold">All Rooms</h1>
+        <p className="text-muted-foreground">View and monitor all rooms</p>
+      </div>
+
+      <div className="flex gap-4">
+        <Input
+          placeholder="Search rooms..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="max-w-sm"
+        />
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-48">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="available">Available</SelectItem>
+            <SelectItem value="occupied">Occupied</SelectItem>
+            <SelectItem value="maintenance">Maintenance</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {rooms.map((room) => (
+        {filteredRooms.map((room) => (
           <Card key={room.id_room}>
             <CardContent className="pt-6">
               <div className="space-y-2">
@@ -64,18 +101,13 @@ export const AdminRoomsPage = () => {
                   <p>👥 Capacity: {room.capacity}</p>
                   {room.description && <p>📝 {room.description}</p>}
                 </div>
-                <div className="pt-2">
-                  <Button variant="outline" size="sm" className="w-full">
-                    Edit
-                  </Button>
-                </div>
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      {rooms.length === 0 && (
+      {filteredRooms.length === 0 && (
         <Card>
           <CardContent className="py-16">
             <p className="text-center text-muted-foreground">No rooms found</p>
