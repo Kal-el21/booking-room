@@ -17,6 +17,15 @@ export const authApi = {
   login: (email: string, password: string) =>
     api.post<ApiResponse<{ user: User; token: string }>>('/auth/login', { email, password }),
   
+  register: (data: {
+    name: string;
+    email: string;
+    password: string;
+    password_confirmation: string;
+    division?: string;
+  }) =>
+    api.post<ApiResponse<{ user: User; token: string }>>('/auth/register', data),
+
   logout: () => api.post<ApiResponse<null>>('/auth/logout'),
   
   me: () => api.get<ApiResponse<User>>('/auth/me'),

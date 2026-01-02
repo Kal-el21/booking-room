@@ -5,6 +5,7 @@ import { Layout } from '@/components/layout/Layout';
 
 // Auth Pages
 import { LoginPage } from '@/pages/auth/LoginPage';
+import { RegisterPage } from './pages/auth/RegisterPage';
 import { UnauthorizedPage } from '@/pages/UnauthorizedPage';
 
 // User Pages
@@ -29,6 +30,7 @@ function App() {
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
         {/* User Routes */}
