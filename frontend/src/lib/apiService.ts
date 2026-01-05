@@ -128,6 +128,8 @@ export const usersApi = {
   getAll: (params?: { role?: string; is_active?: boolean; search?: string }) =>
     api.get<ApiResponse<User[]> | PaginatedResponse<User>>('/users', { params }),
   
+  getById: (id: number) => api.get<ApiResponse<User>>(`/users/${id}`),
+
   updateProfile: (id: number, data: { name?: string; division?: string; email?: string }) =>
     api.put<ApiResponse<User>>(`/users/${id}`, data),
   

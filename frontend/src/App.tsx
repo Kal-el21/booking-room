@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { Toaster } from '@/components/ui/sonner'; // ✅ CHANGED
+import { Toaster } from '@/components/ui/sonner';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { Layout } from '@/components/layout/Layout';
 
@@ -16,13 +16,19 @@ import { CreateRequestPage } from '@/pages/user/CreateRequestPage';
 // Room Admin Pages
 import { AdminRoomsPage } from '@/pages/admin/RoomsPage';
 import { CreateRoomPage } from '@/pages/admin/CreateRoomPage';
-import { UsersPage } from '@/pages/admin/UsersPage'; // ✅ NEW
+import { UsersPage } from '@/pages/admin/UsersPage';
+// import { EditUserPage } from '@/pages/admin/EditUserPage';
+import { EditUserPage } from './pages/admin/editUserPage';
 
 // GA Pages
 import { GADashboardPage } from '@/pages/ga/DashboardPage';
 import { PendingRequestsPage } from '@/pages/ga/PendingRequestsPage';
 import { CalendarPage } from '@/pages/ga/CalendarPage';
 import { GARoomsPage } from '@/pages/ga/RoomsPage';
+
+// Shared Pages
+import { NotificationsPage } from '@/pages/NotificationsPage';
+import { ProfilePage } from '@/pages/ProfilePage';
 
 function App() {
   return (
@@ -32,6 +38,28 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
+
+        {/* Shared Routes - Accessible by all authenticated users */}
+        <Route
+          path="/notifications"
+          element={
+            <ProtectedRoute allowedRoles={['user', 'room_admin', 'GA']}>
+              <Layout>
+                <NotificationsPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute allowedRoles={['user', 'room_admin', 'GA']}>
+              <Layout>
+                <ProfilePage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
 
         {/* User Routes */}
         <Route
@@ -96,6 +124,16 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/admin/users/edit/:id"
+          element={
+            <ProtectedRoute allowedRoles={['room_admin']}>
+              <Layout>
+                <EditUserPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
 
         {/* GA Routes */}
         <Route
@@ -145,7 +183,7 @@ function App() {
         {/* 404 */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
-      <Toaster /> {/* ✅ CHANGED */}
+      <Toaster />
     </BrowserRouter>
   );
 }

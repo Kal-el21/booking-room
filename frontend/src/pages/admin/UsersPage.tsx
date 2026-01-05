@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { usersApi } from '@/lib/apiService';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Search, UserCog, Mail, Briefcase, Shield, CheckCircle, XCircle, Edit } from 'lucide-react';
 
 export const UsersPage = () => {
+  const navigate = useNavigate();
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -74,6 +76,10 @@ export const UsersPage = () => {
       default:
         return 'bg-slate-500/10 text-slate-400 border-slate-500/20';
     }
+  };
+
+  const handleEditUser = (userId: number) => {
+    navigate(`/admin/users/edit/${userId}`);
   };
 
   if (loading) return <LoadingSpinner text="Loading users..." />;
@@ -231,9 +237,8 @@ export const UsersPage = () => {
 
                 {/* Edit Button */}
                 <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="w-full border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white"
+                  onClick={() => handleEditUser(user.id_user)}
+                  className="w-full bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 hover:text-white transition-colors"
                 >
                   <Edit className="mr-2 h-4 w-4" />
                   Edit User
@@ -265,8 +270,6 @@ export const UsersPage = () => {
     </div>
   );
 };
-
-
 
 
 // import { useEffect, useState } from 'react';
