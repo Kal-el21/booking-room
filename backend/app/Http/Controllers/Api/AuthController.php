@@ -69,7 +69,9 @@ class AuthController extends Controller
         // Delete old tokens
         $user->tokens()->delete();
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $token = $user->createToken(
+            'token-name', ['*'], now()->plus(weeks: 1)
+        )->plainTextToken;
 
         return response()->json([
             'success' => true,

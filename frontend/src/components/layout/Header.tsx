@@ -31,6 +31,7 @@ export const Header = () => {
     // Poll for new notifications every 30 seconds
     const interval = setInterval(() => {
       fetchUnreadCount();
+      fetchRecentNotifications();
     }, 30000);
 
     return () => clearInterval(interval);
@@ -51,11 +52,9 @@ export const Header = () => {
     try {
       const response = await notificationsApi.getAll({ per_page: 5 });
       if (response.data.success && response.data.data) {
-        // Handle both paginated and non-paginated response
-        const notifData = Array.isArray(response.data.data) 
-          ? response.data.data 
-          : response.data.data.data || [];
-        setNotifications(notifData);
+        // Handle paginated response
+        const notifData = response.data.data.data || response.data.data;
+        setNotifications(Array.isArray(notifData) ? notifData : []);
       }
     } catch (err) {
       console.error('Failed to fetch notifications:', err);
@@ -74,16 +73,16 @@ export const Header = () => {
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
-      case 'request_approved':
+      case 'booking_confirmed':
         return '✅';
-      case 'request_rejected':
+      case 'cancellation':
         return '❌';
-      case 'booking_reminder':
+      case 'reminder':
         return '⏰';
-      case 'request_submitted':
-        return '📝';
-      default:
+      case 'room_changed':
         return '🔔';
+      default:
+        return '📢';
     }
   };
 
@@ -101,6 +100,16 @@ export const Header = () => {
       return formatDistanceToNow(new Date(date), { addSuffix: true });
     } catch {
       return 'recently';
+    }
+  };
+
+  const handleNotificationClick = (notification: Notification) => {
+    if (!notification.is_read) {
+      handleMarkAsRead(notification.id_notification);
+    }
+    // Navigate based on notification type
+    if (notification.id_booking) {
+      navigate(`/bookings`);
     }
   };
 
@@ -152,16 +161,9 @@ export const Header = () => {
                     <DropdownMenuItem
                       key={notification.id_notification}
                       className={`text-slate-300 focus:bg-slate-800 focus:text-white cursor-pointer p-4 ${
-                        !notification.read_at ? 'bg-slate-800/30' : ''
+                        !notification.is_read ? 'bg-slate-800/30' : ''
                       }`}
-                      onClick={() => {
-                        if (!notification.read_at) {
-                          handleMarkAsRead(notification.id_notification);
-                        }
-                        if (notification.data?.url) {
-                          navigate(notification.data.url);
-                        }
-                      }}
+                      onClick={() => handleNotificationClick(notification)}
                     >
                       <div className="flex gap-3 w-full">
                         <div className="text-2xl flex-shrink-0">
@@ -169,16 +171,16 @@ export const Header = () => {
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-sm text-white mb-1">
-                            {notification.data?.title || 'Notification'}
+                            {notification.title}
                           </p>
                           <p className="text-xs text-slate-400 line-clamp-2">
-                            {notification.data?.message || notification.data?.body}
+                            {notification.message}
                           </p>
                           <div className="flex items-center justify-between mt-2">
                             <p className="text-xs text-slate-600">
                               {getTimeAgo(notification.created_at)}
                             </p>
-                            {!notification.read_at && (
+                            {!notification.is_read && (
                               <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
                             )}
                           </div>

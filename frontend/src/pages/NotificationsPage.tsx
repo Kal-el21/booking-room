@@ -12,8 +12,6 @@ import {
   CheckCheck, 
   Trash2, 
   Filter,
-  Calendar,
-  FileText,
   CheckCircle,
   XCircle,
   Clock,
@@ -47,11 +45,11 @@ export const NotificationsPage = () => {
       setLoading(true);
       const response = await notificationsApi.getAll();
       if (response.data.success && response.data.data) {
-        const notifData = Array.isArray(response.data.data) 
-          ? response.data.data 
-          : response.data.data.data || [];
-        setNotifications(notifData);
-        setUnreadCount(notifData.filter((n: Notification) => !n.read_at).length);
+        // Handle paginated response
+        const notifData = response.data.data.data || response.data.data;
+        const notifArray = Array.isArray(notifData) ? notifData : [];
+        setNotifications(notifArray);
+        setUnreadCount(notifArray.filter((n: Notification) => !n.is_read).length);
       }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to load notifications');
@@ -65,9 +63,9 @@ export const NotificationsPage = () => {
 
     // Filter by read/unread status
     if (activeTab === 'unread') {
-      filtered = filtered.filter(n => !n.read_at);
+      filtered = filtered.filter(n => !n.is_read);
     } else if (activeTab === 'read') {
-      filtered = filtered.filter(n => n.read_at);
+      filtered = filtered.filter(n => n.is_read);
     }
 
     // Filter by type
@@ -109,26 +107,25 @@ export const NotificationsPage = () => {
   };
 
   const handleNotificationClick = (notification: Notification) => {
-    if (!notification.read_at) {
+    if (!notification.is_read) {
       handleMarkAsRead(notification.id_notification);
     }
-    if (notification.data?.url) {
-      navigate(notification.data.url);
+    // Navigate based on notification type or booking
+    if (notification.id_booking) {
+      navigate(`/bookings`);
     }
   };
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
-      case 'request_approved':
+      case 'booking_confirmed':
         return <CheckCircle className="h-6 w-6 text-green-400" />;
-      case 'request_rejected':
+      case 'cancellation':
         return <XCircle className="h-6 w-6 text-red-400" />;
-      case 'booking_reminder':
+      case 'reminder':
         return <Clock className="h-6 w-6 text-yellow-400" />;
-      case 'request_submitted':
-        return <FileText className="h-6 w-6 text-blue-400" />;
-      case 'booking_cancelled':
-        return <AlertCircle className="h-6 w-6 text-orange-400" />;
+      case 'room_changed':
+        return <AlertCircle className="h-6 w-6 text-blue-400" />;
       default:
         return <Bell className="h-6 w-6 text-slate-400" />;
     }
@@ -136,22 +133,21 @@ export const NotificationsPage = () => {
 
   const getNotificationBgColor = (type: string) => {
     switch (type) {
-      case 'request_approved':
+      case 'booking_confirmed':
         return 'bg-green-500/10';
-      case 'request_rejected':
+      case 'cancellation':
         return 'bg-red-500/10';
-      case 'booking_reminder':
+      case 'reminder':
         return 'bg-yellow-500/10';
-      case 'request_submitted':
+      case 'room_changed':
         return 'bg-blue-500/10';
-      case 'booking_cancelled':
-        return 'bg-orange-500/10';
       default:
         return 'bg-slate-500/10';
     }
   };
 
-  const getTimeAgo = (date: string) => {
+  const getTimeAgo = (date: string | null) => {
+    if (!date) return 'recently';
     try {
       return formatDistanceToNow(new Date(date), { addSuffix: true });
     } catch {
@@ -161,11 +157,10 @@ export const NotificationsPage = () => {
 
   const getTypeName = (type: string) => {
     const typeMap: Record<string, string> = {
-      request_approved: 'Request Approved',
-      request_rejected: 'Request Rejected',
-      booking_reminder: 'Booking Reminder',
-      request_submitted: 'Request Submitted',
-      booking_cancelled: 'Booking Cancelled',
+      booking_confirmed: 'Booking Confirmed',
+      cancellation: 'Cancelled/Rejected',
+      reminder: 'Reminder',
+      room_changed: 'Room Update',
     };
     return typeMap[type] || type;
   };
@@ -214,7 +209,7 @@ export const NotificationsPage = () => {
           <CardContent className="pt-6">
             <div className="text-center">
               <div className="text-2xl font-bold text-green-400">
-                {notifications.filter(n => n.read_at).length}
+                {notifications.filter(n => n.is_read).length}
               </div>
               <p className="text-sm text-slate-400 mt-1">Read</p>
             </div>
@@ -247,17 +242,17 @@ export const NotificationsPage = () => {
             <SelectItem value="all" className="text-slate-300 focus:bg-slate-800 focus:text-white">
               All Types
             </SelectItem>
-            <SelectItem value="request_approved" className="text-slate-300 focus:bg-slate-800 focus:text-white">
-              Request Approved
+            <SelectItem value="booking_confirmed" className="text-slate-300 focus:bg-slate-800 focus:text-white">
+              Booking Confirmed
             </SelectItem>
-            <SelectItem value="request_rejected" className="text-slate-300 focus:bg-slate-800 focus:text-white">
-              Request Rejected
+            <SelectItem value="cancellation" className="text-slate-300 focus:bg-slate-800 focus:text-white">
+              Cancelled/Rejected
             </SelectItem>
-            <SelectItem value="booking_reminder" className="text-slate-300 focus:bg-slate-800 focus:text-white">
-              Booking Reminder
+            <SelectItem value="reminder" className="text-slate-300 focus:bg-slate-800 focus:text-white">
+              Reminder
             </SelectItem>
-            <SelectItem value="request_submitted" className="text-slate-300 focus:bg-slate-800 focus:text-white">
-              Request Submitted
+            <SelectItem value="room_changed" className="text-slate-300 focus:bg-slate-800 focus:text-white">
+              Room Update
             </SelectItem>
           </SelectContent>
         </Select>
@@ -282,7 +277,7 @@ export const NotificationsPage = () => {
             value="read"
             className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-blue-700 data-[state=active]:text-white text-slate-400"
           >
-            Read ({notifications.filter(n => n.read_at).length})
+            Read ({notifications.filter(n => n.is_read).length})
           </TabsTrigger>
         </TabsList>
 
@@ -309,7 +304,7 @@ export const NotificationsPage = () => {
                 <Card 
                   key={notification.id_notification}
                   className={`bg-slate-900/80 border-slate-800 backdrop-blur-sm hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-200 cursor-pointer ${
-                    !notification.read_at ? 'border-l-4 border-l-blue-500' : ''
+                    !notification.is_read ? 'border-l-4 border-l-blue-500' : ''
                   }`}
                   onClick={() => handleNotificationClick(notification)}
                 >
@@ -324,9 +319,9 @@ export const NotificationsPage = () => {
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
                               <h3 className="font-semibold text-white">
-                                {notification.data?.title || 'Notification'}
+                                {notification.title}
                               </h3>
-                              {!notification.read_at && (
+                              {!notification.is_read && (
                                 <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
                               )}
                             </div>
@@ -336,7 +331,7 @@ export const NotificationsPage = () => {
                           </div>
                           
                           <div className="flex gap-2">
-                            {!notification.read_at && (
+                            {!notification.is_read && (
                               <Button
                                 size="sm"
                                 variant="ghost"
@@ -364,15 +359,25 @@ export const NotificationsPage = () => {
                         </div>
                         
                         <p className="text-sm text-slate-400 mb-3">
-                          {notification.data?.message || notification.data?.body || 'No message'}
+                          {notification.message}
                         </p>
+                        
+                        {notification.booking && (
+                          <div className="bg-slate-800/30 rounded-lg p-3 mb-3">
+                            <p className="text-xs text-slate-500 mb-1">Booking Details:</p>
+                            <p className="text-sm text-white font-medium">{notification.booking.room.room_name}</p>
+                            <p className="text-xs text-slate-400">
+                              {notification.booking.date} • {notification.booking.start_time} - {notification.booking.end_time}
+                            </p>
+                          </div>
+                        )}
                         
                         <div className="flex items-center gap-4 text-xs text-slate-600">
                           <span className="flex items-center gap-1">
                             <Clock className="h-3 w-3" />
                             {getTimeAgo(notification.created_at)}
                           </span>
-                          {notification.read_at && (
+                          {notification.is_read && notification.read_at && (
                             <span className="flex items-center gap-1">
                               <CheckCheck className="h-3 w-3" />
                               Read {getTimeAgo(notification.read_at)}
