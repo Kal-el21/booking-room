@@ -31,14 +31,14 @@ class AuthController extends Controller
         // Send verification email (optional)
         // $user->sendEmailVerificationNotification();
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        // $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'success' => true,
             'message' => 'Registration successful',
             'data' => [
                 'user' => $user,
-                'token' => $token,
+                // 'token' => $token,
             ]
         ], 201);
     }
@@ -65,6 +65,15 @@ class AuthController extends Controller
                 'message' => 'Your account is inactive. Please contact administrator.',
             ], 403);
         }
+
+        // ✅ CHECK IF EMAIL VERIFIED (OPTIONAL)
+        // if (!$user->hasVerifiedEmail()) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Please verify your email address before logging in.',
+        //         'needs_verification' => true,
+        //     ], 403);
+        // }
 
         // Delete old tokens
         $user->tokens()->delete();

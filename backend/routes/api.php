@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\DashboardController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -39,6 +40,44 @@ Route::middleware('auth:sanctum')->group(function () {
     // Auth Routes
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/auth/me', [AuthController::class, 'me']);
+
+//     // Email Verification Notice
+//     Route::get('/email/verify', function () {
+//         return response()->json([
+//             'success' => false,
+//             'message' => 'Please verify your email address.',
+//         ], 403);
+//     })->name('verification.notice');
+
+//     // Email Verification Handler
+//     Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+//         $request->fulfill();
+
+//         return response()->json([
+//             'success' => true,
+//             'message' => 'Email verified successfully!',
+//         ]);
+//     })->middleware(['signed'])->name('verification.verify');
+
+//     // Resend Verification Email
+//     Route::post('/email/verification-notification', function (Request $request) {
+//         if ($request->user()->hasVerifiedEmail()) {
+//             return response()->json([
+//                 'success' => false,
+//                 'message' => 'Email already verified.',
+//             ], 400);
+//         }
+
+//         $request->user()->sendEmailVerificationNotification();
+
+//         return response()->json([
+//             'success' => true,
+//             'message' => 'Verification email sent!',
+//         ]);
+//     })->middleware(['throttle:6,1'])->name('verification.send');
+// });
+
+// Route::middleware('auth:sanctum', 'verified')->group(function () {
 
     // ============================================
     // USER ROUTES (All Authenticated Users)

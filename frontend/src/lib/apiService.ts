@@ -26,6 +26,9 @@ export const authApi = {
   }) =>
     api.post<ApiResponse<{ user: User; token: string }>>('/auth/register', data),
 
+  // resendVerificationEmail: () =>
+  //   api.post<ApiResponse<null>>('/email/verification-notification'),
+  
   logout: () => api.post<ApiResponse<null>>('/auth/logout'),
   
   me: () => api.get<ApiResponse<User>>('/auth/me'),
